@@ -2,4 +2,7 @@
     <string name="app_name">around</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="perm_location_rationale">Please provide location access for a better experience</string>
+  <string name="perm_location_acceptance">OK</string>
+  <string name="perm_location_cancel">NO THANKS</string>
 </resources>
