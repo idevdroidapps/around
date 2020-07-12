@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
     ).get(SharedViewModel::class.java)
 
     binding.viewModel = viewModel
+    binding.lifecycleOwner = this
 
   }
 

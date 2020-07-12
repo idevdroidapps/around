@@ -18,7 +18,6 @@ class SharedViewModel(
   application: Application,
   private val fusedLocationProviderClient: FusedLocationProviderClient
 ) : AndroidViewModel(application) {
-
   private val app = application
 
   private var _locationPermission = MutableLiveData<Boolean>()

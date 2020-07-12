@@ -23,7 +23,6 @@ class PlacesFragment : Fragment() {
   ): View? {
     val binding: FragmentPlacesBinding =
       DataBindingUtil.inflate(inflater, R.layout.fragment_places, container, false)
-    binding.viewModel = viewModel
 
     viewModel.locationPermission.observe(viewLifecycleOwner, Observer { hasPermission ->
       if (!hasPermission) {
@@ -33,6 +32,8 @@ class PlacesFragment : Fragment() {
       }
     })
 
+    binding.viewModel = viewModel
+    binding.lifecycleOwner = this
     return binding.root
   }
 
