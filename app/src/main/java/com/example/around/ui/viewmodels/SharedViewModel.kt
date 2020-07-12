@@ -82,9 +82,7 @@ class SharedViewModel(
       }
       val results = searchResponse.results
       results?.let {
-        for (result in it) {
-          Log.d("PLACE", result.placeId)
-        }
+
       }
     }
   }
