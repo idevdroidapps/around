@@ -4,11 +4,11 @@ import android.location.Location
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 
-@BindingAdapter("location")
-fun TextView.setLocation(location: Location?) {
+@BindingAdapter("lastLocation")
+fun TextView.setLastLocation(location: Location?) {
   location?.let {
-    val lat = it.latitude
-    val long = it.longitude
+    val lat = it.latitude.toString()
+    val long = it.longitude.toString()
     val txtLoc = "Lat: $lat, Long: $long"
     text = txtLoc
   }

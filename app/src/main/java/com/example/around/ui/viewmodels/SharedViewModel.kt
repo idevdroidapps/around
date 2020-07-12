@@ -4,14 +4,20 @@ import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.around.R
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
+import com.google.android.gms.location.FusedLocationProviderClient
 
-class SharedViewModel(application: Application) : AndroidViewModel(application) {
+class SharedViewModel(
+  application: Application,
+  private val fusedLocationProviderClient: FusedLocationProviderClient
+) : AndroidViewModel(application) {
 
   private val app = application
 
@@ -36,10 +42,32 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
   fun searchNearbyPlaces() {
     if (hasPermission()) {
-      Toast.makeText(app, "SEARCH STARTED", Toast.LENGTH_SHORT).show()
+      try {
+        val locationResult = fusedLocationProviderClient.lastLocation
+        locationResult.addOnCompleteListener {
+          if (it.isSuccessful) {
+            val result = it.result
+            if(result != null){
+              Log.d("LOCATION",it.result?.latitude.toString() + ", " + it.result?.longitude.toString())
+              _lastLocation.value = it.result
+            } else {
+              showErrorToast()
+            }
+          } else {
+            showErrorToast()
+          }
+        }
+      } catch (e: SecurityException) {
+        _locationPermission.value = false
+      }
     } else {
       _locationPermission.value = false
     }
+  }
+
+  private fun showErrorToast() {
+    Toast.makeText(app, app.getString(R.string.err_msg_no_location), Toast.LENGTH_SHORT)
+      .show()
   }
 
   private fun hasPermission(): Boolean {

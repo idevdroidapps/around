@@ -5,4 +5,5 @@
   <string name="perm_location_rationale">Please provide location access for a better experience</string>
   <string name="perm_location_acceptance">OK</string>
   <string name="perm_location_cancel">NO THANKS</string>
+  <string name="err_msg_no_location">Could not get device location, please try again.</string>
 </resources>

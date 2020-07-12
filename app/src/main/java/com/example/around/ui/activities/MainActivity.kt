@@ -12,6 +12,7 @@ import com.example.around.data.utils.Constants
 import com.example.around.databinding.ActivityMainBinding
 import com.example.around.ui.di.Injection
 import com.example.around.ui.viewmodels.SharedViewModel
+import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
 
@@ -22,9 +23,11 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
     val binding: ActivityMainBinding = DataBindingUtil
       .setContentView(this@MainActivity, R.layout.activity_main)
 
+    val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
     viewModel = ViewModelProvider(
       this@MainActivity,
-      Injection.provideMainActViewModelFactory(application)
+      Injection.provideMainActViewModelFactory(application, fusedLocationProviderClient)
     ).get(SharedViewModel::class.java)
 
     binding.viewModel = viewModel
