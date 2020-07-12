@@ -10,9 +10,23 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.around.R
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.maps.GeoApiContext
+import com.google.maps.PlacesApi
+import com.google.maps.model.LatLng
+import com.google.maps.model.PlaceType
+import com.google.maps.model.PlacesSearchResponse
+import com.google.maps.model.RankBy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class SharedViewModel(
   application: Application,
@@ -35,23 +49,19 @@ class SharedViewModel(
       PERMISSIONS_LOCATION_REQUEST_CODE -> {
         _locationPermission.value = grantResults.isNotEmpty() &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED
+        startPlacesSearch()
       }
     }
   }
 
-  fun searchNearbyPlaces() {
+  fun startPlacesSearch() {
     if (hasPermission()) {
       try {
         val locationResult = fusedLocationProviderClient.lastLocation
         locationResult.addOnCompleteListener {
-          if (it.isSuccessful) {
-            val result = it.result
-            if(result != null){
-              Log.d("LOCATION",it.result?.latitude.toString() + ", " + it.result?.longitude.toString())
-              _lastLocation.value = it.result
-            } else {
-              showErrorToast()
-            }
+          if (it.isSuccessful && it.result != null) {
+            _lastLocation.value = it.result
+            fetchPlaces()
           } else {
             showErrorToast()
           }
@@ -63,6 +73,57 @@ class SharedViewModel(
       _locationPermission.value = false
     }
   }
+
+  private fun fetchPlaces() {
+    viewModelScope.launch {
+      var searchResponse = PlacesSearchResponse()
+      withContext(Dispatchers.IO) {
+        searchResponse = conductNearbyQuery()
+      }
+      val results = searchResponse.results
+      results?.let {
+        for (result in it) {
+          Log.d("PLACE", result.placeId)
+        }
+      }
+    }
+  }
+
+  private suspend fun conductNearbyQuery(): PlacesSearchResponse =
+    suspendCoroutine { continuation ->
+      _lastLocation.value?.let { location ->
+        try {
+          val geoApiContext =
+            GeoApiContext.Builder().apiKey(app.getString(R.string.maps_api_key)).build()
+          PlacesApi.nearbySearchQuery(geoApiContext, LatLng(location.latitude, location.longitude))
+            .radius(5000)
+            .rankby(RankBy.PROMINENCE)
+            .keyword("chinese")
+            .language("en")
+            .type(PlaceType.RESTAURANT)
+            .setCallback(object : com.google.maps.PendingResult.Callback<PlacesSearchResponse> {
+              override fun onFailure(e: Throwable?) {
+                e?.let {
+                  continuation.resumeWithException(it)
+                }
+              }
+
+              override fun onResult(result: PlacesSearchResponse?) {
+                result?.let {
+                  continuation.resume(it)
+                }
+              }
+            })
+        } catch (e: IllegalStateException) {
+          GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(app, e.message, Toast.LENGTH_LONG).show()
+            }
+          }
+        }
+      }
+
+    }
 
   private fun showErrorToast() {
     Toast.makeText(app, app.getString(R.string.err_msg_no_location), Toast.LENGTH_SHORT)

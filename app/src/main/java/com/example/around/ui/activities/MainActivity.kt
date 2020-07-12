@@ -27,7 +27,10 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
 
     viewModel = ViewModelProvider(
       this@MainActivity,
-      Injection.provideMainActViewModelFactory(application, fusedLocationProviderClient)
+      Injection.provideMainActViewModelFactory(
+        application,
+        fusedLocationProviderClient
+      )
     ).get(SharedViewModel::class.java)
 
     binding.viewModel = viewModel

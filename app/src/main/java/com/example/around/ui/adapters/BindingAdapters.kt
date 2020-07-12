@@ -12,7 +12,7 @@ object BindingAdapters {
     location?.let {
       val lat = it.latitude.toString()
       val long = it.longitude.toString()
-      val txtLoc = "Lat: $lat, Long: $long"
+      val txtLoc = "Current Location: $lat,  $long"
       view.text = txtLoc
     }
   }

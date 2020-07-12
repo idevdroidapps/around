@@ -27,13 +27,17 @@ class PlacesFragment : Fragment() {
     viewModel.locationPermission.observe(viewLifecycleOwner, Observer { hasPermission ->
       if (!hasPermission) {
         providePermissionRationale()
-      } else{
-        viewModel.searchNearbyPlaces()
       }
     })
 
+    viewModel.lastLocation.observe(viewLifecycleOwner, Observer {
+      val lat = it.latitude.toString()
+      val long = it.longitude.toString()
+      val txtLoc = "Current Location: $lat,  $long"
+      binding.textView.text = txtLoc
+    })
+
     binding.viewModel = viewModel
-    binding.lifecycleOwner = this
     return binding.root
   }
 
