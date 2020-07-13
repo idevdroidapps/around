@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.example.around.R
 import com.example.around.databinding.FragmentPlacesBinding
+import com.example.around.ui.adapters.SearchResultListAdapter
 import com.example.around.ui.viewmodels.SharedViewModel
 
 class PlacesFragment : Fragment() {
@@ -35,6 +36,13 @@ class PlacesFragment : Fragment() {
       val long = it.longitude.toString()
       val txtLoc = "Current Location: $lat,  $long"
       binding.textView.text = txtLoc
+    })
+
+    val listAdapter = SearchResultListAdapter()
+    binding.recyclerViewPlaces.adapter = listAdapter
+
+    viewModel.searchResults.observe(viewLifecycleOwner, Observer {
+      listAdapter.submitList(it)
     })
 
     binding.viewModel = viewModel

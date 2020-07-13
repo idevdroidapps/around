@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.around.R
+import com.example.around.data.models.SearchResult
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.maps.GeoApiContext
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.ArrayList
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -40,9 +42,11 @@ class SharedViewModel(
   private var _lastLocation = MutableLiveData<Location>()
   val lastLocation: LiveData<Location> get() = _lastLocation
 
+  private var _searchResults = MutableLiveData<List<SearchResult>>()
+  val searchResults: LiveData<List<SearchResult>> get() = _searchResults
+
   fun onRequestPermissionsResult(
     requestCode: Int,
-    permissions: Array<out String>,
     grantResults: IntArray
   ) {
     when (requestCode) {
@@ -81,8 +85,12 @@ class SharedViewModel(
         searchResponse = conductNearbyQuery()
       }
       val results = searchResponse.results
-      results?.let {
-
+      val placesList = ArrayList<SearchResult>()
+      results?.let { searchResults ->
+        searchResults.forEach {
+          placesList.add(SearchResult(it.name, it.photos.first().photoReference))
+        }
+        _searchResults.value = placesList.subList(0,10)
       }
     }
   }

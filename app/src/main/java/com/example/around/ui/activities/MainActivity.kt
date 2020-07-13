@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
     grantResults: IntArray
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    viewModel?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    viewModel?.onRequestPermissionsResult(requestCode, grantResults)
   }
 
   override fun onClick(dialog: DialogInterface?, which: Int) {
