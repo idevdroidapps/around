@@ -11,6 +11,7 @@ import com.example.around.R
 import com.example.around.data.models.SearchResult
 
 
+
 @BindingAdapter("placeImage")
 fun ImageView.setPlaceImage(place: SearchResult?) {
   place?.let {
