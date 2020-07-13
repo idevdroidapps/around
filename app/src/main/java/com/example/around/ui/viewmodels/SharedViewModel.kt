@@ -10,7 +10,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagedList
 import com.example.around.R
+import com.example.around.data.models.NearbySearch
+import com.example.around.data.models.NearbySearchWithPlaces
 import com.example.around.data.models.SearchResult
 import com.example.around.data.repositories.SearchesRepository
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
@@ -43,8 +46,7 @@ class SharedViewModel(
   private var _lastLocation = MutableLiveData<Location>()
   val lastLocation: LiveData<Location> get() = _lastLocation
 
-  private var _searchResults = MutableLiveData<List<SearchResult>>()
-  val searchResults: LiveData<List<SearchResult>> get() = _searchResults
+  var searchResults: LiveData<PagedList<NearbySearchWithPlaces>> = searchesRepository.getSearches()
 
   fun onRequestPermissionsResult(
     requestCode: Int,
@@ -54,19 +56,18 @@ class SharedViewModel(
       PERMISSIONS_LOCATION_REQUEST_CODE -> {
         _locationPermission.value = grantResults.isNotEmpty() &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED
-        startPlacesSearch()
       }
     }
   }
 
-  fun startPlacesSearch() {
+  fun startPlacesSearch(query: String) {
     if (hasPermission()) {
       try {
         val locationResult = fusedLocationProviderClient.lastLocation
         locationResult.addOnCompleteListener {
           if (it.isSuccessful && it.result != null) {
             _lastLocation.value = it.result
-            fetchPlaces()
+            fetchPlaces(query)
           } else {
             showErrorToast()
           }
@@ -79,24 +80,41 @@ class SharedViewModel(
     }
   }
 
-  private fun fetchPlaces() {
+  private fun fetchPlaces(query: String) {
     viewModelScope.launch {
-      var searchResponse = PlacesSearchResponse()
       withContext(Dispatchers.IO) {
-        searchResponse = conductNearbyQuery()
-      }
-      val results = searchResponse.results
-      val placesList = ArrayList<SearchResult>()
-      results?.let { searchResults ->
-        searchResults.forEach {
-//          placesList.add(SearchResult(it.name, it.photos.first().photoReference))
+        var searchResponse = PlacesSearchResponse()
+        withContext(Dispatchers.IO) {
+          searchResponse = conductNearbyQuery(query)
         }
-        _searchResults.value = placesList.subList(0, 10)
+        val results = searchResponse.results
+        val placesList = ArrayList<SearchResult>()
+        results?.let { searchResults ->
+          val iter = searchResults.iterator()
+          var iterCount = 0
+          viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+              searchesRepository.insertSearch(NearbySearch(query))
+              while (iter.hasNext() && iterCount < 10) {
+                val place = iter.next()
+                placesList.add(SearchResult(
+                  place.placeId,
+                  place.name,
+                  place.rating,
+                  place.photos.first().photoReference,
+                  query)
+                )
+                iterCount++
+              }
+              searchesRepository.insertPlaces(placesList)
+            }
+          }
+        }
       }
     }
   }
 
-  private suspend fun conductNearbyQuery(): PlacesSearchResponse =
+  private suspend fun conductNearbyQuery(query: String): PlacesSearchResponse =
     suspendCoroutine { continuation ->
       _lastLocation.value?.let { location ->
         try {
@@ -105,7 +123,7 @@ class SharedViewModel(
           PlacesApi.nearbySearchQuery(geoApiContext, LatLng(location.latitude, location.longitude))
             .radius(5000)
             .rankby(RankBy.PROMINENCE)
-            .keyword("chinese")
+            .keyword(query)
             .language("en")
             .type(PlaceType.RESTAURANT)
             .setCallback(object : com.google.maps.PendingResult.Callback<PlacesSearchResponse> {

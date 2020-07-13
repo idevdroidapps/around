@@ -1,30 +1,40 @@
 package com.example.around.data.database
 
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.around.data.models.NearbySearch
 import com.example.around.data.models.NearbySearchWithPlaces
+import com.example.around.data.models.SearchResult
 
 @Dao
 interface SearchesDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insert(search: NearbySearch): Long
+  suspend fun insertSearch(search: NearbySearch): Long
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @JvmSuppressWildcards
   suspend fun insertSearches(searches: List<NearbySearch>)
 
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertPlace(place: SearchResult): Long
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  @JvmSuppressWildcards
+  suspend fun insertPlaces(places: List<SearchResult>)
+
   @Update
-  suspend fun update(search: NearbySearch)
+  fun update(search: NearbySearch)
 
   @Delete
-  suspend fun deleteSearch(search: NearbySearch)
+  fun deleteSearch(search: NearbySearch)
 
   @Transaction
   @Query("DELETE FROM NearbySearch")
-  suspend fun clearSearches()
+  fun clearSearchHistory()
 
   @Transaction
   @Query("SELECT * FROM NearbySearch")
-  suspend fun getPreviousSearches(): List<NearbySearchWithPlaces>
+  fun getNearbySearchWithPlaces(): DataSource.Factory<Int, NearbySearchWithPlaces>
 
 }

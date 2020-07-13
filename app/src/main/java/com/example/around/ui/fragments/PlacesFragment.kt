@@ -45,6 +45,10 @@ class PlacesFragment : Fragment() {
       listAdapter.submitList(it)
     })
 
+    binding.button.setOnClickListener {
+      viewModel.startPlacesSearch("chinese")
+    }
+
     binding.viewModel = viewModel
     return binding.root
   }

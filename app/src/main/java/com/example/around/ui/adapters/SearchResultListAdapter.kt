@@ -1,12 +1,12 @@
 package com.example.around.ui.adapters
 
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import com.example.around.data.models.SearchResult
+import com.example.around.data.models.NearbySearchWithPlaces
 import com.example.around.ui.viewholders.SearchResultViewHolder
 
-class SearchResultListAdapter : ListAdapter<SearchResult, SearchResultViewHolder>(DiffCallback) {
+class SearchResultListAdapter : PagedListAdapter<NearbySearchWithPlaces, SearchResultViewHolder>(DiffCallback) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
     return SearchResultViewHolder.from(parent)
@@ -14,16 +14,16 @@ class SearchResultListAdapter : ListAdapter<SearchResult, SearchResultViewHolder
 
   override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
     getItem(position)?.let {
-      holder.bind(it)
+      holder.bind(it.places[position])
     }
   }
 
-  companion object DiffCallback : DiffUtil.ItemCallback<SearchResult>() {
-    override fun areItemsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
-      return oldItem.name === newItem.name
+  companion object DiffCallback : DiffUtil.ItemCallback<NearbySearchWithPlaces>() {
+    override fun areItemsTheSame(oldItem: NearbySearchWithPlaces, newItem: NearbySearchWithPlaces): Boolean {
+      return oldItem.search.id === newItem.search.id
     }
 
-    override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
+    override fun areContentsTheSame(oldItem: NearbySearchWithPlaces, newItem: NearbySearchWithPlaces): Boolean {
       return oldItem == newItem
     }
   }
