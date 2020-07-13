@@ -88,7 +88,7 @@ class SharedViewModel(
       val placesList = ArrayList<SearchResult>()
       results?.let { searchResults ->
         searchResults.forEach {
-          placesList.add(SearchResult(it.name, it.photos.first().photoReference))
+//          placesList.add(SearchResult(it.name, it.photos.first().photoReference))
         }
         _searchResults.value = placesList.subList(0,10)
       }

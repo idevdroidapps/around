@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import com.example.around.data.models.NearbySearch
-import com.example.around.data.utils.ResultConverter
+import com.example.around.data.models.SearchResult
 
-@Database(entities = [NearbySearch::class], version = 1, exportSchema = false)
-@TypeConverters(ResultConverter::class)
+@Database(entities = [NearbySearch::class, SearchResult::class], version = 1, exportSchema = false)
 abstract class SearchesDatabase: RoomDatabase() {
 
   abstract val searchesDao: SearchesDao

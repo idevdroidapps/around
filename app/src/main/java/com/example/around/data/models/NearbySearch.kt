@@ -2,8 +2,8 @@ package com.example.around.data.models
 
 import androidx.room.*
 
-@Entity(tableName = "searches_table")
-data class NearbySearch (
-  @PrimaryKey @ColumnInfo(name = "query") val query: String,
-  val results: List<SearchResult>
+@Entity
+data class NearbySearch(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "queryId") val id: Long,
+    @ColumnInfo(name = "query") val query: String
 )

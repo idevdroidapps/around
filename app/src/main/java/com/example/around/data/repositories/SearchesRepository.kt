@@ -6,7 +6,7 @@ import com.example.around.data.models.NearbySearch
 class SearchesRepository private constructor(private val searchesDao: SearchesDao) {
 
   fun insertSearches(searches: List<NearbySearch>) {
-    searchesDao.insertSearches(searches)
+//    searchesDao.insertSearches(searches)
   }
 
   companion object {

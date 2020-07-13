@@ -2,24 +2,29 @@ package com.example.around.data.database
 
 import androidx.room.*
 import com.example.around.data.models.NearbySearch
+import com.example.around.data.models.NearbySearchWithPlaces
 
 @Dao
 interface SearchesDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(search: NearbySearch): Long
+  suspend fun insert(search: NearbySearch): Long
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  @JvmSuppressWildcards
-  fun insertSearches(searches: List<NearbySearch>)
+  suspend fun insertSearches(searches: List<NearbySearch>)
 
   @Update
-  fun update(search: NearbySearch)
+  suspend fun update(search: NearbySearch)
 
   @Delete
-  fun deleteSearch(search: NearbySearch)
+  suspend fun deleteSearch(search: NearbySearch)
 
-  @Query("DELETE FROM searches_table")
-  fun clearSearches()
+  @Transaction
+  @Query("DELETE FROM NearbySearch")
+  suspend fun clearSearches()
+
+  @Transaction
+  @Query("SELECT * FROM NearbySearch")
+  suspend fun getPreviousSearches(): List<NearbySearchWithPlaces>
 
 }
