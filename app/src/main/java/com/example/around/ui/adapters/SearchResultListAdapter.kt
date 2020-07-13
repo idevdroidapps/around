@@ -3,18 +3,20 @@ package com.example.around.ui.adapters
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.example.around.data.models.NearbySearchWithPlaces
+import com.example.around.ui.viewholders.NearbySearchViewHolder
 import com.example.around.ui.viewholders.SearchResultViewHolder
 
-class SearchResultListAdapter : PagedListAdapter<NearbySearchWithPlaces, SearchResultViewHolder>(DiffCallback) {
+class SearchResultListAdapter : PagedListAdapter<NearbySearchWithPlaces, RecyclerView.ViewHolder>(DiffCallback) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-    return SearchResultViewHolder.from(parent)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    return NearbySearchViewHolder.from(parent)
   }
 
-  override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     getItem(position)?.let {
-      holder.bind(it.places[position])
+      (holder as NearbySearchViewHolder).bind(it.search)
     }
   }
 
@@ -24,7 +26,11 @@ class SearchResultListAdapter : PagedListAdapter<NearbySearchWithPlaces, SearchR
     }
 
     override fun areContentsTheSame(oldItem: NearbySearchWithPlaces, newItem: NearbySearchWithPlaces): Boolean {
-      return oldItem == newItem
+      var same = true
+      oldItem.places.forEachIndexed { index, searchResult ->
+        if(searchResult.id != newItem.places[index].id) same = false
+      }
+      return same
     }
   }
 }

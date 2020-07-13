@@ -3,14 +3,15 @@ package com.example.around.ui.viewholders
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.around.data.models.NearbySearchWithPlaces
 import com.example.around.data.models.SearchResult
 import com.example.around.databinding.ItemPlaceBinding
 
 class SearchResultViewHolder(private val binding: ItemPlaceBinding) :
   RecyclerView.ViewHolder(binding.root) {
 
-  fun bind(item: SearchResult) {
-    binding.place = item
+  fun bind(searchResult: SearchResult) {
+    binding.place = searchResult
     binding.executePendingBindings()
   }
 

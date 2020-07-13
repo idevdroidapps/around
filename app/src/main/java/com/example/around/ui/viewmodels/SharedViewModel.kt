@@ -101,7 +101,7 @@ class SharedViewModel(
                   place.placeId,
                   place.name,
                   place.rating,
-                  place.photos.first().photoReference,
+                  place.photos?.first()?.photoReference,
                   query)
                 )
                 iterCount++
