@@ -5,12 +5,11 @@ import com.example.around.data.models.NearbySearch
 
 class SearchesRepository private constructor(private val searchesDao: SearchesDao) {
 
-  fun insertSearches(searches: List<NearbySearch>) {
-//    searchesDao.insertSearches(searches)
+  suspend fun insertSearches(searches: List<NearbySearch>) {
+    searchesDao.insertSearches(searches)
   }
 
   companion object {
-
     // For Singleton instantiation
     @Volatile
     private var instance: SearchesRepository? = null

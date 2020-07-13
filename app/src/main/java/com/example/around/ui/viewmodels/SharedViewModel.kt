@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.location.Location
-import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -13,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.around.R
 import com.example.around.data.models.SearchResult
+import com.example.around.data.repositories.SearchesRepository
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.maps.GeoApiContext
@@ -25,14 +25,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayList
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class SharedViewModel(
   application: Application,
-  private val fusedLocationProviderClient: FusedLocationProviderClient
+  private val fusedLocationProviderClient: FusedLocationProviderClient,
+  private val searchesRepository: SearchesRepository
 ) : AndroidViewModel(application) {
   private val app = application
 
@@ -90,7 +91,7 @@ class SharedViewModel(
         searchResults.forEach {
 //          placesList.add(SearchResult(it.name, it.photos.first().photoReference))
         }
-        _searchResults.value = placesList.subList(0,10)
+        _searchResults.value = placesList.subList(0, 10)
       }
     }
   }
