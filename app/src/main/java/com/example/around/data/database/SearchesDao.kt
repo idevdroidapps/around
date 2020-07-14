@@ -41,4 +41,7 @@ interface SearchesDao {
   @Query("SELECT * FROM NearbySearch")
   fun getNearbySearches(): LiveData<List<NearbySearch>>
 
+  @Query("SELECT * FROM SearchResult WHERE searchId = :query")
+  fun getSearchHistory(query: String): List<SearchResult>
+
 }

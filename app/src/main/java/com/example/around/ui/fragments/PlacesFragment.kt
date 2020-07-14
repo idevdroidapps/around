@@ -23,6 +23,7 @@ import com.example.around.ui.viewmodels.SharedViewModel
 
 class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
+  private lateinit var binding: FragmentPlacesBinding
   private val viewModel: SharedViewModel by activityViewModels()
   private lateinit var popUpMenu: PopupMenu
 
@@ -31,7 +32,7 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    val binding: FragmentPlacesBinding =
+    binding =
       DataBindingUtil.inflate(inflater, R.layout.fragment_places, container, false)
 
     viewModel.locationPermission.observe(viewLifecycleOwner, Observer { hasPermission ->
@@ -80,7 +81,9 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
   override fun onMenuItemClick(menuItem: MenuItem?): Boolean {
     activity?.let { act ->
       menuItem?.let { item ->
-        Toast.makeText(context, item.title.toString(), Toast.LENGTH_SHORT).show()
+        val query = item.title.toString()
+        binding.editTextCouponSearch.hint = query
+        viewModel.getSearchHistory(query)
       }
     }
     return true

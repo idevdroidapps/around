@@ -34,6 +34,8 @@ class SearchesRepository private constructor(private val searchesDao: SearchesDa
     return LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE).build()
   }
 
+  fun getSearchHistory(query: String) = searchesDao.getSearchHistory(query)
+
   companion object {
     // For Singleton instantiation
     @Volatile

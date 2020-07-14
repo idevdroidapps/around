@@ -66,6 +66,17 @@ class SharedViewModel(
     }
   }
 
+  fun getSearchHistory(query: String){
+    viewModelScope.launch {
+      var searchResults = listOf<SearchResult>()
+      withContext(Dispatchers.IO){
+        searchResults = searchesRepository.getSearchHistory(query)
+      }
+      _searchResults.value = searchResults.asReversed()
+    }
+
+  }
+
   fun startPlacesSearch(query: String, distance: Int) {
     lastQuery = query
     lastDistance = distance
