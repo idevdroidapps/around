@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -49,6 +51,13 @@ class PlacesFragment : Fragment() {
     initEditText(binding)
     initSeekBar(binding)
 
+    activity?.let {
+      val historyImageVIew = it.findViewById<ImageView>(R.id.imageView_history)
+      historyImageVIew?.setOnClickListener {
+        Toast.makeText(context, "History", Toast.LENGTH_SHORT).show()
+      }
+    }
+
     binding.viewModel = viewModel
     return binding.root
   }
@@ -67,10 +76,10 @@ class PlacesFragment : Fragment() {
     }
   }
 
-  private fun initSeekBar(binding: FragmentPlacesBinding){
+  private fun initSeekBar(binding: FragmentPlacesBinding) {
     val defaultHeaderTxt = "${resources.getInteger(R.integer.default_distance_miles)} miles"
     binding.textViewDistanceHeader.text = defaultHeaderTxt
-    binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+    binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         val progressText = "$progress miles"
         binding.textViewDistanceHeader.text = progressText

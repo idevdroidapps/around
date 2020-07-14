@@ -1,6 +1,7 @@
 package com.example.around.ui.activities
 
 import android.Manifest
+import android.app.ActionBar
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
     super.onCreate(savedInstanceState)
     val binding: ActivityMainBinding = DataBindingUtil
       .setContentView(this@MainActivity, R.layout.activity_main)
+    actionBar?.hide()
 
     val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -61,6 +63,5 @@ class MainActivity : AppCompatActivity(), DialogInterface.OnClickListener {
       }
     }
   }
-
 
 }
