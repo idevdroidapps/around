@@ -16,6 +16,7 @@ import com.example.around.data.models.SearchResult
 import com.example.around.data.repositories.SearchesRepository
 import com.example.around.data.utils.Constants.DEFAULT_RANGE_METERS
 import com.example.around.data.utils.Constants.METER_FACTOR
+import com.example.around.data.utils.Constants.NO_KEYWORD
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.maps.GeoApiContext
@@ -43,7 +44,6 @@ class SharedViewModel(
   val locationPermission: LiveData<Boolean> get() = _locationPermission
 
   private var _lastLocation = MutableLiveData<Location>()
-  val lastLocation: LiveData<Location> get() = _lastLocation
 
   private var _searchResults = MutableLiveData<List<SearchResult>>()
   val searchResults: LiveData<List<SearchResult>> get() = _searchResults
@@ -90,35 +90,36 @@ class SharedViewModel(
 
   private fun fetchPlaces(query: String, distance: Int) {
     viewModelScope.launch {
+      var searchResponse = PlacesSearchResponse()
       withContext(Dispatchers.IO) {
-        var searchResponse = PlacesSearchResponse()
+        searchResponse = conductNearbyQuery(query, distance)
+      }
+      val results = searchResponse.results
+      val placesList = ArrayList<SearchResult>()
+      results?.let { searchResults ->
+        val iter = searchResults.iterator()
+        var iterCount = 0
         withContext(Dispatchers.IO) {
-          searchResponse = conductNearbyQuery(query, distance)
-        }
-        val results = searchResponse.results
-        val placesList = ArrayList<SearchResult>()
-        results?.let { searchResults ->
-          viewModelScope.launch {
-            val iter = searchResults.iterator()
-            var iterCount = 0
-            withContext(Dispatchers.IO) {
-              searchesRepository.insertSearch(NearbySearch(query, distance))
-              while (iter.hasNext() && iterCount < 10) {
-                val place = iter.next()
-                placesList.add(SearchResult(
-                  place.placeId,
-                  place.name,
-                  place.rating,
-                  place.photos?.first()?.photoReference,
-                  query)
-                )
-                iterCount++
-              }
-              searchesRepository.insertPlaces(placesList)
-            }
-            _searchResults.value = placesList
+          val readyQuery = if (query.isBlank()) {
+            NO_KEYWORD
+          } else {
+            query
           }
+          searchesRepository.insertSearch(NearbySearch(readyQuery, distance))
+          while (iter.hasNext() && iterCount < 10) {
+            val place = iter.next()
+            placesList.add(SearchResult(
+              place.placeId,
+              place.name,
+              place.rating,
+              place.photos?.first()?.photoReference,
+              query)
+            )
+            iterCount++
+          }
+          searchesRepository.insertPlaces(placesList)
         }
+        _searchResults.value = placesList
       }
     }
   }
@@ -127,9 +128,11 @@ class SharedViewModel(
     suspendCoroutine { continuation ->
       _lastLocation.value?.let { location ->
         try {
-          val convertedDistance: Int = if((distance > 0) && (distance.times(METER_FACTOR) < 50000)) {
+          val convertedDistance: Int = if ((distance > 0) && (distance.times(METER_FACTOR) < 50000)) {
             distance.times(METER_FACTOR)
-          } else if (distance == 0){ METER_FACTOR } else DEFAULT_RANGE_METERS
+          } else if (distance == 0) {
+            METER_FACTOR
+          } else DEFAULT_RANGE_METERS
           val geoApiContext =
             GeoApiContext.Builder().apiKey(app.getString(R.string.maps_api_key)).build()
           PlacesApi.nearbySearchQuery(geoApiContext, LatLng(location.latitude, location.longitude))
@@ -166,7 +169,7 @@ class SharedViewModel(
       .show()
   }
 
-  fun hasPermission(): Boolean {
+  private fun hasPermission(): Boolean {
     return ContextCompat.checkSelfPermission(
       app.applicationContext,
       Manifest.permission.ACCESS_FINE_LOCATION

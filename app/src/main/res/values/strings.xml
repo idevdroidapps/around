@@ -4,7 +4,6 @@
   <string name="perm_location_acceptance">OK</string>
   <string name="perm_location_cancel">NO THANKS</string>
   <string name="err_msg_no_location">Could not get device location or nearby places, please try again.</string>
-  <string name="btn_around_me">what\'s around me?</string>
-  <string name="hint_search">Search NearBy</string>
+  <string name="hint_search">Search Nearby</string>
   <string name="distance_header">distance</string>
 </resources>

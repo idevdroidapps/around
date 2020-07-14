@@ -5,4 +5,5 @@ object Constants {
     const val DATABASE_PAGE_SIZE = 30
     const val DEFAULT_RANGE_METERS = 16090
     const val METER_FACTOR = 1609
+    const val NO_KEYWORD = "Search Nearby"
 }
