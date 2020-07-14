@@ -15,11 +15,10 @@ fun ImageView.setPlaceImage(place: SearchResult?) {
   place?.let {
     val options = RequestOptions()
       .diskCacheStrategy(DiskCacheStrategy.NONE)
-      .override(200, 150)
       .fitCenter()
     try {
       val baseurl = "https://maps.googleapis.com/maps/api/place/photo?"
-      val maxwidth = "maxwidth=400"
+      val maxwidth = "maxwidth=600"
       val key= "&key=${this.context.resources.getString(R.string.maps_api_key)}"
       val photoreference = "&photoreference=${it.image}"
       val requestUri = Uri.parse("$baseurl$maxwidth$photoreference$key")

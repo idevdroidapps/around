@@ -1,36 +1,30 @@
 package com.example.around.ui.adapters
 
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.example.around.data.models.NearbySearchWithPlaces
-import com.example.around.ui.viewholders.NearbySearchViewHolder
+import androidx.recyclerview.widget.ListAdapter
+import com.example.around.data.models.SearchResult
 import com.example.around.ui.viewholders.SearchResultViewHolder
 
-class SearchResultListAdapter : PagedListAdapter<NearbySearchWithPlaces, RecyclerView.ViewHolder>(DiffCallback) {
+class SearchResultListAdapter : ListAdapter<SearchResult, SearchResultViewHolder>(DiffCallback) {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-    return NearbySearchViewHolder.from(parent)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
+    return SearchResultViewHolder.from(parent)
   }
 
-  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
     getItem(position)?.let {
-      (holder as NearbySearchViewHolder).bind(it.search)
+      holder.bind(it)
     }
   }
 
-  companion object DiffCallback : DiffUtil.ItemCallback<NearbySearchWithPlaces>() {
-    override fun areItemsTheSame(oldItem: NearbySearchWithPlaces, newItem: NearbySearchWithPlaces): Boolean {
-      return oldItem.search.id === newItem.search.id
+  companion object DiffCallback : DiffUtil.ItemCallback<SearchResult>() {
+    override fun areItemsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
+      return oldItem === newItem
     }
 
-    override fun areContentsTheSame(oldItem: NearbySearchWithPlaces, newItem: NearbySearchWithPlaces): Boolean {
-      var same = true
-      oldItem.places.forEachIndexed { index, searchResult ->
-        if(searchResult.id != newItem.places[index].id) same = false
-      }
-      return same
+    override fun areContentsTheSame(oldItem: SearchResult, newItem: SearchResult): Boolean {
+      return oldItem.id == newItem.id
     }
   }
 }

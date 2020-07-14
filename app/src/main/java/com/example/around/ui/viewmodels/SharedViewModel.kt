@@ -46,7 +46,8 @@ class SharedViewModel(
   private var _lastLocation = MutableLiveData<Location>()
   val lastLocation: LiveData<Location> get() = _lastLocation
 
-  var searchResults: LiveData<PagedList<NearbySearchWithPlaces>> = searchesRepository.getSearches()
+  private var _searchResults = MutableLiveData<List<SearchResult>>()
+  val searchResults: LiveData<List<SearchResult>> get() = _searchResults
 
   fun onRequestPermissionsResult(
     requestCode: Int,
@@ -90,9 +91,9 @@ class SharedViewModel(
         val results = searchResponse.results
         val placesList = ArrayList<SearchResult>()
         results?.let { searchResults ->
-          val iter = searchResults.iterator()
-          var iterCount = 0
           viewModelScope.launch {
+            val iter = searchResults.iterator()
+            var iterCount = 0
             withContext(Dispatchers.IO) {
               searchesRepository.insertSearch(NearbySearch(query))
               while (iter.hasNext() && iterCount < 10) {
@@ -108,6 +109,7 @@ class SharedViewModel(
               }
               searchesRepository.insertPlaces(placesList)
             }
+            _searchResults.value = placesList
           }
         }
       }
