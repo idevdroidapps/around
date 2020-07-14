@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -41,16 +42,21 @@ class PlacesFragment : Fragment() {
       listAdapter.submitList(it)
     })
 
+    binding.imageViewSearchButton.setOnClickListener {
+      startSearch(binding)
+    }
+
+    initEditText(binding)
+    initSeekBar(binding)
+
+    binding.viewModel = viewModel
+    return binding.root
+  }
+
+  private fun initEditText(binding: FragmentPlacesBinding) {
     val editText = binding.editTextCouponSearch
     editText.onClickKeyboardDoneButton {
-      val query = binding.editTextCouponSearch.text.toString()
-      viewModel.startPlacesSearch(query)
-
-      binding.editTextCouponSearch.clearFocus()
-      view?.let {
-        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(it.windowToken, 0)
-      }
+      startSearch(binding)
     }
     editText.setOnFocusChangeListener { view, hasFocus ->
       if (hasFocus) {
@@ -59,9 +65,26 @@ class PlacesFragment : Fragment() {
         binding.editTextCouponSearch.hint = getString(R.string.hint_search)
       }
     }
+  }
 
-    binding.viewModel = viewModel
-    return binding.root
+  private fun initSeekBar(binding: FragmentPlacesBinding){
+    val defaultHeaderTxt = "${resources.getInteger(R.integer.default_distance_miles)} miles"
+    binding.textViewDistanceHeader.text = defaultHeaderTxt
+    binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+      override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        val progressText = "$progress miles"
+        binding.textViewDistanceHeader.text = progressText
+      }
+
+      override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+      }
+
+      override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+      }
+
+    })
   }
 
   private fun providePermissionRationale() {
@@ -71,6 +94,17 @@ class PlacesFragment : Fragment() {
         PermDialogFragment::class.java.simpleName
       )
     }
+  }
+
+  private fun startSearch(binding: FragmentPlacesBinding) {
+    binding.editTextCouponSearch.clearFocus()
+    view?.let {
+      val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+      imm.hideSoftInputFromWindow(it.windowToken, 0)
+    }
+
+    val query = binding.editTextCouponSearch.text.toString()
+    viewModel.startPlacesSearch(query, binding.seekBar.progress)
   }
 
 }

@@ -29,7 +29,7 @@
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="White House" />
+        tools:text="Chipotle" />
 
       <androidx.cardview.widget.CardView
         android:id="@+id/cardView_place_image"

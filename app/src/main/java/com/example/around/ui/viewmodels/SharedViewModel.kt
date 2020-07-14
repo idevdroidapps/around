@@ -10,18 +10,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagedList
 import com.example.around.R
 import com.example.around.data.models.NearbySearch
-import com.example.around.data.models.NearbySearchWithPlaces
 import com.example.around.data.models.SearchResult
 import com.example.around.data.repositories.SearchesRepository
+import com.example.around.data.utils.Constants.DEFAULT_RANGE_METERS
+import com.example.around.data.utils.Constants.METER_FACTOR
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
 import com.google.maps.model.LatLng
-import com.google.maps.model.PlaceType
 import com.google.maps.model.PlacesSearchResponse
 import com.google.maps.model.RankBy
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +49,7 @@ class SharedViewModel(
   val searchResults: LiveData<List<SearchResult>> get() = _searchResults
 
   private lateinit var lastQuery: String
+  private var lastDistance: Int = application.resources.getInteger(R.integer.default_distance_miles)
 
   fun onRequestPermissionsResult(
     requestCode: Int,
@@ -59,20 +59,21 @@ class SharedViewModel(
       PERMISSIONS_LOCATION_REQUEST_CODE -> {
         _locationPermission.value = grantResults.isNotEmpty() &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED
-        startPlacesSearch(lastQuery)
+        startPlacesSearch(lastQuery, lastDistance)
       }
     }
   }
 
-  fun startPlacesSearch(query: String) {
+  fun startPlacesSearch(query: String, distance: Int) {
     lastQuery = query
+    lastDistance = distance
     if (hasPermission()) {
       try {
         val locationResult = fusedLocationProviderClient.lastLocation
         locationResult.addOnCompleteListener {
           if (it.isSuccessful && it.result != null) {
             _lastLocation.value = it.result
-            fetchPlaces(lastQuery)
+            fetchPlaces(lastQuery, lastDistance)
           } else {
             showErrorToast()
           }
@@ -85,12 +86,12 @@ class SharedViewModel(
     }
   }
 
-  private fun fetchPlaces(query: String) {
+  private fun fetchPlaces(query: String, distance: Int) {
     viewModelScope.launch {
       withContext(Dispatchers.IO) {
         var searchResponse = PlacesSearchResponse()
         withContext(Dispatchers.IO) {
-          searchResponse = conductNearbyQuery(query)
+          searchResponse = conductNearbyQuery(query, distance)
         }
         val results = searchResponse.results
         val placesList = ArrayList<SearchResult>()
@@ -99,7 +100,7 @@ class SharedViewModel(
             val iter = searchResults.iterator()
             var iterCount = 0
             withContext(Dispatchers.IO) {
-              searchesRepository.insertSearch(NearbySearch(query))
+              searchesRepository.insertSearch(NearbySearch(query, distance))
               while (iter.hasNext() && iterCount < 10) {
                 val place = iter.next()
                 placesList.add(SearchResult(
@@ -120,18 +121,20 @@ class SharedViewModel(
     }
   }
 
-  private suspend fun conductNearbyQuery(query: String): PlacesSearchResponse =
+  private suspend fun conductNearbyQuery(query: String, distance: Int): PlacesSearchResponse =
     suspendCoroutine { continuation ->
       _lastLocation.value?.let { location ->
         try {
+          val convertedDistance: Int = if((distance > 0) && (distance.times(METER_FACTOR) < 50000)) {
+            distance.times(METER_FACTOR)
+          } else if (distance == 0){ METER_FACTOR } else DEFAULT_RANGE_METERS
           val geoApiContext =
             GeoApiContext.Builder().apiKey(app.getString(R.string.maps_api_key)).build()
           PlacesApi.nearbySearchQuery(geoApiContext, LatLng(location.latitude, location.longitude))
-            .radius(5000)
+            .radius(convertedDistance)
             .rankby(RankBy.PROMINENCE)
             .keyword(query)
             .language("en")
-            .type(PlaceType.RESTAURANT)
             .setCallback(object : com.google.maps.PendingResult.Callback<PlacesSearchResponse> {
               override fun onFailure(e: Throwable?) {
                 e?.let {
