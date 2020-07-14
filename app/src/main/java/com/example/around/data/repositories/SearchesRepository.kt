@@ -27,6 +27,8 @@ class SearchesRepository private constructor(private val searchesDao: SearchesDa
     searchesDao.insertPlace(place)
   }
 
+  fun getNearybySearches() = searchesDao.getNearbySearches()
+
   fun getNearbySearchesWithPlaces(): LiveData<PagedList<NearbySearchWithPlaces>> {
     val dataSourceFactory = searchesDao.getNearbySearchWithPlaces()
     return LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE).build()

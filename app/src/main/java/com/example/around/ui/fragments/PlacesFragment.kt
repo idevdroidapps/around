@@ -3,10 +3,12 @@ package com.example.around.ui.fragments
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -19,9 +21,10 @@ import com.example.around.ui.adapters.SearchResultListAdapter
 import com.example.around.ui.utils.onClickKeyboardDoneButton
 import com.example.around.ui.viewmodels.SharedViewModel
 
-class PlacesFragment : Fragment() {
+class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
   private val viewModel: SharedViewModel by activityViewModels()
+  private lateinit var popUpMenu: PopupMenu
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -44,6 +47,18 @@ class PlacesFragment : Fragment() {
       listAdapter.submitList(it)
     })
 
+    viewModel.previousSearches.observe(viewLifecycleOwner, Observer { nearbySearches ->
+      activity?.let {
+        val historyBtn = it.findViewById<ImageView>(R.id.imageView_history)
+        popUpMenu = PopupMenu(context, historyBtn)
+        popUpMenu.setOnMenuItemClickListener(this@PlacesFragment)
+        popUpMenu.menuInflater.inflate(R.menu.history_menu, popUpMenu.menu)
+        for (nearbySearch in nearbySearches) {
+          popUpMenu.menu.add(R.id.menuGroup_search_history, 0, 0, nearbySearch.id)
+        }
+      }
+    })
+
     binding.imageViewSearchButton.setOnClickListener {
       startSearch(binding)
     }
@@ -54,12 +69,21 @@ class PlacesFragment : Fragment() {
     activity?.let {
       val historyImageVIew = it.findViewById<ImageView>(R.id.imageView_history)
       historyImageVIew?.setOnClickListener {
-        Toast.makeText(context, "History", Toast.LENGTH_SHORT).show()
+        popUpMenu.show()
       }
     }
 
     binding.viewModel = viewModel
     return binding.root
+  }
+
+  override fun onMenuItemClick(menuItem: MenuItem?): Boolean {
+    activity?.let { act ->
+      menuItem?.let { item ->
+        Toast.makeText(context, item.title.toString(), Toast.LENGTH_SHORT).show()
+      }
+    }
+    return true
   }
 
   private fun initEditText(binding: FragmentPlacesBinding) {

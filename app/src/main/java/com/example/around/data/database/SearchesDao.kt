@@ -1,5 +1,6 @@
 package com.example.around.data.database
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 import com.example.around.data.models.NearbySearch
@@ -36,5 +37,8 @@ interface SearchesDao {
   @Transaction
   @Query("SELECT * FROM NearbySearch")
   fun getNearbySearchWithPlaces(): DataSource.Factory<Int, NearbySearchWithPlaces>
+
+  @Query("SELECT * FROM NearbySearch")
+  fun getNearbySearches(): LiveData<List<NearbySearch>>
 
 }

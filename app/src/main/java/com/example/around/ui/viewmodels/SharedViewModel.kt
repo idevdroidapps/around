@@ -51,6 +51,8 @@ class SharedViewModel(
   private lateinit var lastQuery: String
   private var lastDistance: Int = application.resources.getInteger(R.integer.default_distance_miles)
 
+  val previousSearches: LiveData<List<NearbySearch>> = searchesRepository.getNearybySearches()
+
   fun onRequestPermissionsResult(
     requestCode: Int,
     grantResults: IntArray
