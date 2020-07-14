@@ -1,14 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context=".ui.fragments.PlacesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <EditText
+      android:id="@+id/editText_coupon_search"
+      android:layout_width="0dp"
+      android:layout_height="?attr/actionBarSize"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      android:layout_weight="2"
+      android:hint="@string/hint_search"
+      android:imeOptions="actionSearch"
+      android:importantForAutofill="no"
+      android:inputType="text"
+      android:selectAllOnFocus="true"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+      android:textSize="18sp"
+      app:layout_constraintEnd_toStartOf="@+id/seekBar"
+      app:layout_constraintStart_toEndOf="@+id/imageView_search_button"
+      app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/recyclerView_places"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_marginTop="24dp"
+      android:background="@android:color/transparent"
+      app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/editText_coupon_search"
+      tools:listitem="@layout/item_place" />
+
+    <SeekBar
+      android:id="@+id/seekBar"
+      android:layout_width="150dp"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="16dp"
+      android:layout_marginEnd="16dp"
+      android:max="@integer/max_distance_miles"
+      android:progress="@integer/default_distance_miles"
+      app:layout_constraintBottom_toTopOf="@+id/recyclerView_places"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/textView_distance_header"
+      app:layout_constraintVertical_bias="0.72" />
+
+    <TextView
+      android:id="@+id/textView_distance_header"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="16dp"
+      android:layout_marginTop="8dp"
+      android:text="@string/distance_header"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+      android:id="@+id/imageView_search_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="8dp"
+      android:padding="4dp"
+      app:layout_constraintBottom_toTopOf="@+id/recyclerView_places"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.27999997"
+      app:srcCompat="?android:attr/actionModeWebSearchDrawable" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <data>
+
+    <variable
+      name="viewModel"
+      type="com.example.around.ui.viewmodels.SharedViewModel" />
+  </data>
+</layout>

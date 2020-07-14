@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">around</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="app_name">around</string>
+  <string name="perm_location_rationale">Please provide location access for a better experience</string>
+  <string name="perm_location_acceptance">OK</string>
+  <string name="perm_location_cancel">NO THANKS</string>
+  <string name="err_msg_no_location">Could not get device location or nearby places, please try again.</string>
+  <string name="hint_search">Search Nearby</string>
+  <string name="distance_header">distance</string>
 </resources>
