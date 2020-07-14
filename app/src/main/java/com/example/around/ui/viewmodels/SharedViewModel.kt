@@ -15,6 +15,7 @@ import com.example.around.data.models.NearbySearch
 import com.example.around.data.models.SearchResult
 import com.example.around.data.repositories.SearchesRepository
 import com.example.around.data.utils.Constants.DEFAULT_RANGE_METERS
+import com.example.around.data.utils.Constants.MAX_RANGE_METERS
 import com.example.around.data.utils.Constants.METER_FACTOR
 import com.example.around.data.utils.Constants.NO_KEYWORD
 import com.example.around.data.utils.Constants.PERMISSIONS_LOCATION_REQUEST_CODE
@@ -72,7 +73,7 @@ class SharedViewModel(
       withContext(Dispatchers.IO){
         searchResults = searchesRepository.getSearchHistory(query)
       }
-      _searchResults.value = searchResults.asReversed()
+      _searchResults.value = searchResults
     }
 
   }
@@ -139,7 +140,7 @@ class SharedViewModel(
     suspendCoroutine { continuation ->
       _lastLocation.value?.let { location ->
         try {
-          val convertedDistance: Int = if ((distance > 0) && (distance.times(METER_FACTOR) < 50000)) {
+          val convertedDistance: Int = if ((distance > 0) && (distance.times(METER_FACTOR) < MAX_RANGE_METERS)) {
             distance.times(METER_FACTOR)
           } else if (distance == 0) {
             METER_FACTOR

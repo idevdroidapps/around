@@ -82,7 +82,6 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     activity?.let { act ->
       menuItem?.let { item ->
         val query = item.title.toString()
-        binding.editTextCouponSearch.hint = query
         viewModel.getSearchHistory(query)
       }
     }
