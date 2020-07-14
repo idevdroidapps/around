@@ -49,6 +49,8 @@ class SharedViewModel(
   private var _searchResults = MutableLiveData<List<SearchResult>>()
   val searchResults: LiveData<List<SearchResult>> get() = _searchResults
 
+  private lateinit var lastQuery: String
+
   fun onRequestPermissionsResult(
     requestCode: Int,
     grantResults: IntArray
@@ -57,18 +59,20 @@ class SharedViewModel(
       PERMISSIONS_LOCATION_REQUEST_CODE -> {
         _locationPermission.value = grantResults.isNotEmpty() &&
           grantResults[0] == PackageManager.PERMISSION_GRANTED
+        startPlacesSearch(lastQuery)
       }
     }
   }
 
   fun startPlacesSearch(query: String) {
+    lastQuery = query
     if (hasPermission()) {
       try {
         val locationResult = fusedLocationProviderClient.lastLocation
         locationResult.addOnCompleteListener {
           if (it.isSuccessful && it.result != null) {
             _lastLocation.value = it.result
-            fetchPlaces(query)
+            fetchPlaces(lastQuery)
           } else {
             showErrorToast()
           }
@@ -157,7 +161,7 @@ class SharedViewModel(
       .show()
   }
 
-  private fun hasPermission(): Boolean {
+  fun hasPermission(): Boolean {
     return ContextCompat.checkSelfPermission(
       app.applicationContext,
       Manifest.permission.ACCESS_FINE_LOCATION
