@@ -2,10 +2,7 @@ package com.example.around.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -56,7 +53,7 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
         popUpMenu.setOnMenuItemClickListener(this@PlacesFragment)
         popUpMenu.menuInflater.inflate(R.menu.history_menu, popUpMenu.menu)
         nearbySearches.forEachIndexed { index, nearbySearch ->
-          popUpMenu.menu.add(R.id.menuGroup_search_history, index, index, nearbySearch.id)
+          popUpMenu.menu.add(R.id.menuGroup_search_history, Menu.NONE, nearbySearches.size.minus(index).minus(1), nearbySearch.id)
         }
       }
     })
