@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.example.around.R
+import com.example.around.data.utils.Constants
 import com.example.around.databinding.FragmentPlacesBinding
 import com.example.around.ui.adapters.SearchResultListAdapter
 import com.example.around.ui.utils.onClickKeyboardDoneButton
@@ -82,6 +83,9 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     activity?.let { act ->
       menuItem?.let { item ->
         val query = item.title.toString()
+        binding.editTextCouponSearch.clearFocus()
+        binding.editTextCouponSearch.text.clear()
+        binding.editTextCouponSearch.hint = query
         viewModel.getSearchHistory(query)
       }
     }
@@ -95,9 +99,9 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     }
     editText.setOnFocusChangeListener { view, hasFocus ->
       if (hasFocus) {
-        binding.editTextCouponSearch.hint = ""
+        editText.hint = ""
       } else {
-        binding.editTextCouponSearch.hint = getString(R.string.hint_search)
+        editText.hint = Constants.NO_KEYWORD
       }
     }
   }

@@ -70,8 +70,9 @@ class SharedViewModel(
   fun getSearchHistory(query: String){
     viewModelScope.launch {
       var searchResults = listOf<SearchResult>()
+      val readyQuery = if(query.isBlank()) NO_KEYWORD else query
       withContext(Dispatchers.IO){
-        searchResults = searchesRepository.getSearchHistory(query)
+        searchResults = searchesRepository.getSearchHistory(readyQuery)
       }
       _searchResults.value = searchResults
     }
@@ -125,7 +126,7 @@ class SharedViewModel(
               place.name,
               place.rating,
               place.photos?.first()?.photoReference,
-              query)
+              readyQuery)
             )
             iterCount++
           }
@@ -151,7 +152,7 @@ class SharedViewModel(
             .radius(convertedDistance)
             .rankby(RankBy.PROMINENCE)
             .keyword(query)
-            .language("en")
+            .language(Locale.getDefault().language)
             .setCallback(object : com.google.maps.PendingResult.Callback<PlacesSearchResponse> {
               override fun onFailure(e: Throwable?) {
                 e?.let {
