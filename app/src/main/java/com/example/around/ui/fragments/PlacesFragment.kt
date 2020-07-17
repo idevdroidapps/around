@@ -54,8 +54,8 @@ class PlacesFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
         popUpMenu = PopupMenu(context, historyBtn)
         popUpMenu.setOnMenuItemClickListener(this@PlacesFragment)
         popUpMenu.menuInflater.inflate(R.menu.history_menu, popUpMenu.menu)
-        for (nearbySearch in nearbySearches) {
-          popUpMenu.menu.add(R.id.menuGroup_search_history, 0, 0, nearbySearch.id)
+        nearbySearches.forEachIndexed { index, nearbySearch ->
+          popUpMenu.menu.add(R.id.menuGroup_search_history, index, index, nearbySearch.id)
         }
       }
     })
