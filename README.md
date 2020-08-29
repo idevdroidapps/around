@@ -13,7 +13,7 @@ As a result from a Places search, the app should:
 ## Built With
 * [Kotlin](https://kotlinlang.org/)
 * [Android Architecture Components](https://developer.android.com/topic/libraries/architecture)
-* [Google Maps Platform - Places Api] (https://github.com/googlemaps/google-maps-services-java)
+* [Google Maps Platform - Places Api](https://github.com/googlemaps/google-maps-services-java)
 
 ## Instructions
 This demo uses the Gradle build system.
